@@ -89,6 +89,7 @@
        name: "{{ docker_image }}"
        source: build  # Critical fix
        build:
+        path: "{{ app_dir }}"
         dockerfile: Dockerfile  # Optional if named "Dockerfile"
        force_source: yes
        force_tag: yes
