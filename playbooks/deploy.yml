@@ -97,18 +97,22 @@
           dockerfile: Dockerfile
         force_source: yes
         force_tag: yes
-      when: dockerfile_check.stat.exists
+        tag: latest
 
-    - name: Arrêter et supprimer ancien container si existe
-      docker_container:
-        name: "{{ docker_container }}"
-        state: absent
+     - name: Verify Docker image exists
+       community.docker.docker_image_info:
+         name: "{{ docker_image }}:latest"
+       register: image_info
 
-    - name: Lancer et exposer le nouveau container CV
-      docker_container:
-        name: "{{ docker_container }}"
-        image: "{{ docker_image }}"
-        state: started
-        restart_policy: always
-        ports:
-          - "80:80"
+- name: Lancer et exposer le nouveau container CV
+  community.docker.docker_container:
+    name: "{{ docker_container }}"
+    image: "{{ docker_image }}:latest"
+    state: started
+    restart_policy: always
+    ports:
+      - "80:80"
+    pull: false
+  when: image_info.images|length > 0
+
+   
