@@ -93,7 +93,7 @@
         dockerfile: Dockerfile  # Optional if named "Dockerfile"
        force_source: yes
        force_tag: yes
-       when: dockerfile_check.stat.exists
+      when: dockerfile_check.stat.exists
 
     - name: Arrêter et supprimer ancien container si existe
       docker_container:
