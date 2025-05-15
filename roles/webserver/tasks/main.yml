@@ -1,0 +1,27 @@
+- name: Installer Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+
+- name: Copier les fichiers du site
+  copy:
+    src: "{{ role_path }}/files/site/"
+    dest: /opt/cv-site/
+    mode: "0755"
+
+- name: Copier le Dockerfile
+  copy:
+    src: "{{ role_path }}/files/Dockerfile"
+    dest: /opt/cv-site/Dockerfile
+
+- name: Build image Docker
+  command: docker build -t cv_site /opt/cv-site/
+
+- name: Lancer le container web
+  docker_container:
+    name: cv_site
+    image: cv_site
+    state: started
+    ports:
+      - "80:80"

@@ -1,0 +1,5 @@
+- name: Déploiement du serveur CV Web
+  hosts: web
+  become: true
+  roles:
+    - webserver
