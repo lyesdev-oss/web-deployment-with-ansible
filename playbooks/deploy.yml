@@ -83,14 +83,18 @@
         version: main
         force: yes
 
+    - name: Verify Dockerfile exists
+      ansible.builtin.stat:
+        path: "{{ app_dir }}/Dockerfile"
+      register: dockerfile_check
+
     - name: Construire l'image Docker CV
       community.docker.docker_image:
-        path: "{{ app_dir }}"
         name: "{{ docker_image }}"
-        source: build  # Critical fix
+        source: build
         build:
-         path: "{{ app_dir }}"
-         dockerfile: Dockerfile  # Optional if named "Dockerfile"
+          path: "{{ app_dir }}"
+          dockerfile: Dockerfile
         force_source: yes
         force_tag: yes
       when: dockerfile_check.stat.exists
