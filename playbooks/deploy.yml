@@ -1,5 +1,94 @@
-- name: Déploiement du serveur CV Web
-  hosts: instance-20250515-1013
+---
+- hosts: localhost
   become: true
-  roles:
-    - webserver
+  vars:
+    container_count: 4
+    default_container_name: docker
+    default_container_image: ubuntu
+    default_container_command: sleep 1d
+    app_dir: "/home/ubuntu/lyes-cv-site"
+    repo_url: "https://github.com/lyesdev-oss/autodeploy-with-ansible-cv-website-FR.git"
+    docker_image: "lyes-cv-site"
+    docker_container: "cv-web"
+
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Pull default Docker image
+      community.docker.docker_image:
+        name: "{{ default_container_image }}"
+        source: pull
+
+    - name: Create default containers
+      community.docker.docker_container:
+        name: "{{ default_container_name }}{{ item }}"
+        image: "{{ default_container_image }}"
+        command: "{{ default_container_command }}"
+        state: present
+      with_sequence: count={{ container_count }}
+      
+    - name: Cloner/Maj dépôt CV
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+
+    - name: Construire l'image Docker CV
+      docker_image:
+        path: "{{ app_dir }}"
+        name: "{{ docker_image }}"
+        force_source: yes
+        force_tag: yes
+
+    - name: Arrêter et supprimer ancien container si existe
+      docker_container:
+        name: "{{ docker_container }}"
+        state: absent
+
+    - name: Lancer et exposer le nouveau container CV
+      docker_container:
+        name: "{{ docker_container }}"
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
+
