@@ -7,7 +7,7 @@
     default_container_image: ubuntu
     default_container_command: sleep 1d
     app_dir: "/home/ubuntu/lyes-cv-site"
-    repo_url: "https://github.com/lyesdev-oss/autodeploy-with-ansible-cv-website-FR.git"
+    repo_url: "https://github.com/lyesdev-oss/web-deployment-with-ansible.git"
     docker_image: "lyes-cv-site"
     docker_container: "cv-web"
 
