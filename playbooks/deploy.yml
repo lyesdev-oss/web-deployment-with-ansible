@@ -47,27 +47,21 @@
         state: latest
         update_cache: true
         
-     - name: Ensure python3-venv is installed (Debian/Ubuntu)
-        ansible.builtin.apt:
+    - name: Ensure python3-venv is installed (Debian/Ubuntu)
+      ansible.builtin.apt:
         name: python3-venv
         state: present
-        when: ansible_facts['os_family'] == 'Debian'
+      when: ansible_facts['os_family'] == 'Debian'
 
-     - name: Create a virtual environment
-        ansible.builtin.command:
+    - name: Create a virtual environment
+      ansible.builtin.command:
         cmd: python3 -m venv /root/venv
         creates: /root/venv/bin/activate  # Only runs if venv doesn't exist
 
-     - name: Install Docker module inside venv
-        ansible.builtin.pip:
-        name: docker
-        virtualenv: /root/venv
-
-    - name: Install Docker Module for Python
+    - name: Install Docker module inside venv
       ansible.builtin.pip:
         name: docker
-        virtualenv: "{{ ansible_user_dir }}/venv"  # Creates a venv if not exists
-        virtualenv_command: python3 -m venv
+        virtualenv: /root/venv
 
     - name: Pull default Docker image
       community.docker.docker_image:
@@ -109,4 +103,3 @@
         restart_policy: always
         ports:
           - "80:80"
-
