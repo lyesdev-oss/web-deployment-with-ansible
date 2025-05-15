@@ -48,8 +48,10 @@
         update_cache: true
 
     - name: Install Docker Module for Python
-      pip:
+      ansible.builtin.pip:
         name: docker
+        virtualenv: "{{ ansible_user_dir }}/venv"  # Creates a venv if not exists
+        virtualenv_command: python3 -m venv
 
     - name: Pull default Docker image
       community.docker.docker_image:
