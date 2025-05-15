@@ -1,5 +1,5 @@
 - name: Déploiement du serveur CV Web
-  hosts: instance-20250513-1742
+  hosts: instance-20250515-1013
   become: true
   roles:
     - webserver
