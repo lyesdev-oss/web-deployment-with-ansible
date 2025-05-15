@@ -7,7 +7,7 @@
     default_container_image: ubuntu
     default_container_command: sleep 1d
     app_dir: "/home/ubuntu/lyes-cv-site"
-    repo_url: "https://github.com/lyesdev-oss/web-deployment-with-ansible.git"
+    repo_url: "https://github.com/lyesdev-oss/autodeploy-with-ansible-cv-website-FR.git"
     docker_image: "lyes-cv-site"
     docker_container: "cv-web"
 
@@ -84,11 +84,14 @@
         force: yes
 
     - name: Construire l'image Docker CV
-      docker_image:
-        path: "{{ app_dir }}"
-        name: "{{ docker_image }}"
-        force_source: yes
-        force_tag: yes
+      community.docker.docker_image:
+       path: "{{ app_dir }}"
+       name: "{{ docker_image }}"
+       source: build  # Critical fix
+      build:
+      dockerfile: Dockerfile  # Optional if named "Dockerfile"
+       force_source: yes
+       force_tag: yes
 
     - name: Arrêter et supprimer ancien container si existe
       docker_container:
